@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { WorkoutsHook } from "../../hook/Workoutshook";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
-
+import { AuthUserhook } from "../../hook/AuthUserhook";
 const Details = ({ workouts }) => {
   const { dispatch } = WorkoutsHook();
   const [editMode, setEditMode] = useState(false);
@@ -10,27 +10,16 @@ const Details = ({ workouts }) => {
     load: workouts.load,
     reps: workouts.reps,
   });
-  useEffect(() => {
-    const fetchWorkouts = async () => {
-      try {
-        const res = await fetch("/api/workouts");
-        if (!res.ok) {
-          throw new Error("Failed to fetch workouts");
-        }
-        const data = await res.json();
-        dispatch({ type: "SET_WORKOUTS", payload: data }); // Updates global state
-      } catch (error) {
-        console.error("Error fetching workouts:", error.message);
-      }
-    };
-
-    fetchWorkouts();
-  }, [dispatch]);
+  const { user } = AuthUserhook();
 
   const handleDelete = async (id) => {
+    if (!user) {
+      return console.error("You must be logged in to delete a workout");
+    }
     try {
       const res = await fetch(`/api/workouts/${id}`, {
         method: "DELETE",
+        headers: { authorization: `Bearer ${user.token}` },
       });
       if (!res.ok) {
         throw new Error("Failed to delete workout");
@@ -43,11 +32,17 @@ const Details = ({ workouts }) => {
   };
 
   const handleUpdate = async (id) => {
+    if (!user) {
+      return console.error("You must be logged in to update a workout");
+    }
     console.log("Updating workout with ID:", updatedWorkout);
     try {
       const res = await fetch(`/api/workouts/${id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${user.token}`,
+        },
         body: JSON.stringify(updatedWorkout),
       });
       console.log("Response:", res);

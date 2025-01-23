@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { WorkoutsHook } from "../../hook/Workoutshook";
+import { AuthUserhook } from "../../hook/AuthUserhook";
 
 const Form = ({ workout, update, setupdate }) => {
   const [load, setload] = useState("");
@@ -7,11 +8,18 @@ const Form = ({ workout, update, setupdate }) => {
   const [title, settitle] = useState("");
   const [error, seterror] = useState(null);
   const { dispatch } = WorkoutsHook();
+  const { user } = AuthUserhook();
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!user) {
+      return seterror("You must be logged in"), e.preventDefault();
+    }
     const response = await fetch("/api/workouts", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        authorization: `Bearer ${user.token}`,
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({ title, load, reps }),
     });
     const json = await response.json();

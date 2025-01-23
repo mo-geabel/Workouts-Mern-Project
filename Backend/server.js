@@ -18,7 +18,7 @@ app.use((req, res, next) => {
 
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/api", router);
+app.use("/api/workouts", router);
 app.use("/api/user", UserRouter);
 mongoose
   .connect(process.env.URL)

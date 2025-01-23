@@ -3,7 +3,8 @@ import Workout from "../modules/workshoutModel.js";
 import mongoose from "mongoose";
 // get all workouts
 const getallworks = async (req, res) => {
-  const workouts = await Workout.find({}).sort({ createdAt: -1 });
+  const user_id = req.User;
+  const workouts = await Workout.find({ user_id }).sort({ createdAt: -1 });
   try {
     res.status(200).json(workouts);
   } catch (err) {
@@ -24,13 +25,14 @@ const getIdwork = async (req, res) => {
 };
 // create new workout
 const createWorkout = async (req, res) => {
+  const user_id = req.User;
   const { title, load, reps } = req.body;
   if (!title || !load || !reps) {
     return res.status(400).json({ err: "please fill all the fields" });
   }
   try {
     // Create a new workout
-    const workout = await Workout.create({ title, load, reps });
+    const workout = await Workout.create({ title, load, reps, user_id });
     res.status(200).json(workout);
   } catch (err) {
     res.status(400).json({ err: err.message });

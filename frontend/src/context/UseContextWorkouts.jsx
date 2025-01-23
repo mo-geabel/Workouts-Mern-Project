@@ -21,11 +21,14 @@ export const UseContextWorkoutsProvider = ({ children }) => {
             workout._id === action.payload._id ? action.payload : workout
           ),
         };
+      case "RESET_WORKOUTS":
+        return [];
       default:
         return State;
     }
   };
   const [State, dispatch] = useReducer(Reducer, { workouts: [] });
+
   return (
     <UseContextWorkouts.Provider value={{ ...State, dispatch }}>
       {children}

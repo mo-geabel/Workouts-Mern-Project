@@ -4,15 +4,18 @@ import { useState, useEffect } from "react";
 import Details from "./Details";
 import Form from "./form";
 import { WorkoutsHook } from "../../hook/Workoutshook";
+import { AuthUserhook } from "../../hook/AuthUserhook";
 
 const Home = () => {
   const { workouts, dispatch } = WorkoutsHook();
   const [update, setUpdate] = useState(false);
-
+  const { user } = AuthUserhook();
   useEffect(() => {
     const fetchWorkouts = async () => {
       try {
-        const res = await fetch("/api/workouts");
+        const res = await fetch("/api/workouts/", {
+          headers: { authorization: `Bearer ${user.token}` },
+        });
         if (!res.ok) {
           throw new Error("Failed to fetch workouts");
         }
@@ -24,9 +27,12 @@ const Home = () => {
         console.error("Error fetching workouts:", error.message);
       }
     };
-
-    fetchWorkouts();
-  }, [dispatch]); // Add `dispatch` if it's stable and doesn't change
+    if (user) {
+      fetchWorkouts();
+    } else {
+      dispatch({ type: "RESET_WORKOUTS" }); // Reset workouts on logout
+    }
+  }, [dispatch, user]); // Add `dispatch` if it's stable and doesn't change
 
   return (
     <div className="home">

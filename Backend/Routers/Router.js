@@ -6,21 +6,24 @@ import {
   DeleteWorkout,
   updatework,
 } from "../controllers/workoutControllers.js";
+import { protect } from "../Middleware/Tokenmiddleware.js";
 const router = express.Router();
+// get auth
 
+router.use(protect);
 // Get all workouts
-router.get("/workouts", getallworks);
+router.get("/", getallworks);
 
 // Get a workout by ID
-router.get("/workouts/:id", getIdwork);
+router.get("/:id", getIdwork);
 
 // Create a new workout
-router.post("/workouts", createWorkout);
+router.post("/", createWorkout);
 
 // Delete a workout
-router.delete("/workouts/:id", DeleteWorkout);
+router.delete("/:id", DeleteWorkout);
 
 // Update a workout
-router.patch("/workouts/:id", updatework);
+router.patch("/:id", updatework);
 
 export default router;

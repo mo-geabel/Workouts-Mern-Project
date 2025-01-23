@@ -1,26 +1,46 @@
-import React, { useState } from "react";
+import React from "react";
+import { useState } from "react";
 import { AuthUserhook } from "../../hook/AuthUserhook";
+
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [error, setError] = useState("");
   const { dispatch } = AuthUserhook();
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await fetch("/api/user/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+    try {
+      const response = await fetch("/api/user/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
 
-      body: JSON.stringify({ email, password }),
-    });
-    console.log("Signup Response:", response);
-    const data = await response.json();
-    console.log(data);
-    dispatch({ type: "LOGIN", payload: data });
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await response.json();
+      console.log("Signup Response:", data);
+      if (!response.ok) {
+        setIsLoaded(false);
+        setError(data.error);
+      }
+      if (response.ok) {
+        setIsLoaded(false);
+        setError("");
+        localStorage.setItem("user", JSON.stringify(data));
+        console.log(data);
+        dispatch({ type: "LOGIN", payload: data });
+        console.log("Signup Response:", response);
+      }
+    } catch (error) {
+      setError(error);
+    }
+
     setEmail("");
     setPassword("");
   };
+
   return (
     <form className="signup" onSubmit={handleSubmit}>
       <h3>Sign up</h3>
@@ -36,7 +56,8 @@ const Signup = () => {
         type="password"
         onChange={(e) => setPassword(e.target.value)}
       />
-      <button>Sign up</button>
+      <button disabled={isLoaded}>Sign up</button>
+      {error && <div className="error">{error}</div>}
     </form>
   );
 };

@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "npm install && node server.js",
-    "dev": "npm install && nodemon server.js"
+    "dev": "npm install && nodemon server.js",
+    "build": "npm install && npm install cross-env && npm install --prefix ../frontend && npm run build --prefix ../frontend"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
